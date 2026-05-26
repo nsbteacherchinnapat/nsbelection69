@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบเลือกตั้งประธานนักเรียน ปีการศึกษา 2569 โรงเรียนบ้านโนนสมบูรณ์</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- canvas-confetti library for celebrating fireworks/confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .purple-blue-btn {
+            background: linear-gradient(135deg, #1d4ed8 0%, #5b21b6 100%);
+            transition: all 0.3s ease;
+        }
+        .purple-blue-btn:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #6d28d9 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+        }
+        .card-glow {
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        .card-glow:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -15px rgba(59, 130, 246, 0.15);
+        }
+        
+        /* 3D Card Flip Styling */
+        .perspective-container {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .is-flipped {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 1.5rem;
+        }
+        .flip-card-front {
+            transform: rotateY(0deg);
+            z-index: 2;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Animation helper for glowing aura */
+        @keyframes glowing-aura {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.15); }
+        }
+        .power-glowing {
+            animation: glowing-aura 1s infinite alternate;
+        }
+
+        /* Cozy cute bounce active character */
+        @keyframes cozy-cute-bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+        .character-bouncing {
+            animation: cozy-cute-bounce 0.5s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col justify-between">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-white border-b border-slate-100 shadow-sm sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showPage('home')">
+                <img src="https://img2.pic.in.th/---3---15534f60e59b0a42.png" alt="ตราโรงเรียน" class="h-10 w-auto" onerror="this.src='https://placehold.co/100x100?text=LOGO'">
+                <div>
+                    <span class="font-bold text-slate-800 text-sm sm:text-base block">โรงเรียนบ้านโนนสมบูรณ์</span>
+                    <span class="text-xs text-slate-500 block">สพป.อุบลราชธานี เขต 4</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <!-- Live Arena Access Button -->
+                <button onclick="showPage('counting-arena')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg text-sm font-bold shadow-sm transition flex items-center space-x-1">
+                    <i class="fa-solid fa-gamepad text-emerald-600"></i>
+                    <span>เปิดเกมอารีน่านับคะแนน</span>
+                </button>
+                <button onclick="checkAdminAccess()" class="text-slate-600 hover:text-indigo-600 px-3 py-1.5 rounded-lg text-sm font-medium transition duration-200 flex items-center space-x-1 hover:bg-slate-100">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span class="hidden sm:inline">ผู้ดูแลระบบ</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- PAGE 1: Home Page -->
+        <section id="page-home" class="space-y-10">
+            <!-- School Hero Banner -->
+            <div class="text-center space-y-6 max-w-3xl mx-auto">
+                <div class="flex justify-center">
+                    <img src="https://img2.pic.in.th/---3---15534f60e59b0a42.png" alt="โลโก้โรงเรียน" class="h-32 sm:h-40 w-auto drop-shadow-xl animate-bounce-slow" onerror="this.src='https://placehold.co/150x150?text=LOGO'">
+                </div>
+                <div class="space-y-2">
+                    <p class="text-indigo-600 font-semibold tracking-wider text-sm sm:text-base uppercase">สพป.อุบลราชธานี เขต 4</p>
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-none">
+                        ระบบเลือกตั้งประธานนักเรียน
+                    </h1>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-gradient">
+                        ปีการศึกษา 2569 โรงเรียนบ้านโนนสมบูรณ์
+                    </h2>
+                </div>
+                
+                <div class="pt-4 flex justify-center space-x-4">
+                    <button onclick="showPage('login')" class="purple-blue-btn text-white font-bold text-lg px-10 py-4 rounded-full shadow-lg transform transition active:scale-95 flex items-center space-x-3">
+                        <i class="fa-solid fa-box-archive text-xl"></i>
+                        <span>ลงคะแนนเลือกตั้ง</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Real-Time Statistics Panel -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Stat Card 1 -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-100 card-glow flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-slate-500">จำนวนผู้มีสิทธิ์ทั้งหมด</p>
+                        <p class="text-3xl font-bold text-slate-800 mt-1" id="stat-total-voters">0</p>
+                    </div>
+                    <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                        <i class="fa-solid fa-users text-2xl"></i>
+                    </div>
+                </div>
+                <!-- Stat Card 2 -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-100 card-glow flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-slate-500">จำนวนผู้มาใช้สิทธิ์แล้ว</p>
+                        <p class="text-3xl font-bold text-indigo-600 mt-1" id="stat-voted-count">0</p>
+                    </div>
+                    <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+                        <i class="fa-solid fa-user-check text-2xl"></i>
+                    </div>
+                </div>
+                <!-- Stat Card 3 -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-100 card-glow flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-slate-500">เปอร์เซ็นต์การใช้สิทธิ์</p>
+                        <p class="text-3xl font-bold text-emerald-600 mt-1" id="stat-percent">0.00%</p>
+                    </div>
+                    <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+                        <i class="fa-solid fa-percent text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart / Realtime Dashboard -->
+            <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm max-w-4xl mx-auto">
+                <div class="border-b border-slate-100 pb-4 mb-6 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <span class="h-3 w-3 bg-red-500 rounded-full animate-ping"></span>
+                        <h3 class="text-lg font-bold text-slate-800">สรุปคะแนนผู้สมัครแบบเรียลไทม์</h3>
+                    </div>
+                    <span class="text-xs font-semibold text-slate-400">อัปเดตอัจฉริยะ</span>
+                </div>
+                <div class="h-72 sm:h-96 relative flex justify-center items-center">
+                    <canvas id="realtimeChart"></canvas>
+                    <div id="no-candidates-msg" class="hidden absolute text-slate-400 text-center font-medium">
+                        <i class="fa-solid fa-chart-simple text-4xl mb-2 block"></i>
+                        ไม่มีผู้สมัครลงรับเลือกตั้งในขณะนี้
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 2: Student Authentication (Login) -->
+        <section id="page-login" class="hidden max-w-md mx-auto py-12">
+            <div class="bg-white rounded-3xl border border-slate-100 p-8 shadow-xl space-y-6">
+                <div class="text-center space-y-2">
+                    <div class="inline-flex p-3 bg-blue-50 text-blue-600 rounded-2xl mb-2">
+                        <i class="fa-solid fa-id-card text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800">เข้าสู่ระบบผู้ลงคะแนน</h3>
+                    <p class="text-sm text-slate-500">ค้นหาและเลือกชื่อ-นามสกุลของคุณเพื่อยืนยันตัวตน</p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- ค้นหาแบบระบุระดับชั้นเรียน (แก้ไขเพิ่มเติมเพื่อความง่ายในการหา) -->
+                    <div>
+                        <label for="voter-class-filter" class="block text-sm font-semibold text-slate-700 mb-1">เลือกชั้นเรียน</label>
+                        <select id="voter-class-filter" onchange="filterVoterDropdown()" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition duration-150">
+                            <option value="">-- แสดงทุกชั้นเรียน --</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="voter-search" class="block text-sm font-semibold text-slate-700 mb-1">พิมพ์ชื่อเพื่อค้นหารายชื่อของคุณ</label>
+                        <div class="relative">
+                            <input type="text" id="voter-search" placeholder="พิมพ์ชื่อ ค้นหา..." oninput="filterVoterDropdown()" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition duration-150">
+                            <span class="absolute right-3 top-3.5 text-slate-400"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="voter-select" class="block text-sm font-semibold text-slate-700 mb-1">เลือกรายชื่อของคุณ</label>
+                        <select id="voter-select" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition duration-150">
+                            <option value="">-- กรุณาเลือกรายชื่อ --</option>
+                        </select>
+                    </div>
+
+                    <button onclick="processVoterLogin()" class="w-full purple-blue-btn text-white font-bold py-3.5 rounded-xl shadow-md transition duration-200 transform active:scale-95 flex items-center justify-center space-x-2">
+                        <span>เข้าสู่ระบบเพื่อใช้สิทธิ์</span>
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    </button>
+                    
+                    <button onclick="showPage('home')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl transition duration-150 text-center block text-sm">
+                        ย้อนกลับหน้าหลัก
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 3: Balloting Page (Voting Screen) -->
+        <section id="page-vote" class="hidden space-y-8 max-w-5xl mx-auto">
+            <div class="bg-indigo-900 rounded-2xl p-6 text-white flex flex-col sm:flex-row items-center justify-between shadow-md">
+                <div class="text-center sm:text-left">
+                    <p class="text-indigo-200 text-xs sm:text-sm font-medium uppercase tracking-wider">กำลังลงคะแนนในนาม</p>
+                    <h3 class="text-xl sm:text-2xl font-bold" id="current-voter-display">ชื่อนักเรียน</h3>
+                    <p class="text-xs text-indigo-200 mt-1" id="current-voter-sub">ชั้น - เลขที่ -</p>
+                </div>
+                <div class="mt-4 sm:mt-0 px-4 py-2 bg-indigo-800/60 backdrop-blur rounded-xl border border-indigo-700 text-center">
+                    <span class="text-xs text-indigo-300 block">สิทธิ์โหวตของคุณ</span>
+                    <span class="text-sm font-bold text-white">เลือกได้เพียง 1 หมายเลข</span>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <h3 class="text-2xl font-extrabold text-slate-800 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-check-to-slot text-indigo-600"></i>
+                    <span>โปรดเลือกหมายเลขผู้สมัครที่คุณไว้วางใจ</span>
+                </h3>
+                <p class="text-slate-500 text-sm mt-1">คลิกเลือกบัตรหมายเลขที่ต้องการลงคะแนน</p>
+            </div>
+
+            <!-- Dynamic Candidate Grid with gorgeous portrait design -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="ballot-grid">
+                <!-- Candidate Card Template -->
+            </div>
+
+            <!-- Confirm Ballot -->
+            <div class="pt-6 border-t border-slate-100 max-w-sm mx-auto">
+                <button onclick="confirmBallot()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-lg py-4 rounded-full shadow-lg transition duration-200 transform hover:-translate-y-1 active:scale-95 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>ยืนยันการลงคะแนน</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- PAGE 4: Counting Arena (Cozy & Cute Pedestal Game Layout) -->
+        <section id="page-counting-arena" class="hidden space-y-6">
+            
+            <!-- Header Panel -->
+            <div class="bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 rounded-3xl p-5 text-white shadow-md flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="p-3 bg-white/20 rounded-full animate-bounce"><i class="fa-solid fa-seedling text-2xl"></i></div>
+                    <div>
+                        <h2 class="text-2xl font-black">เวทีนับคะแนน Cozy Game แท่นประชันสด 🎮</h2>
+                        <p class="text-emerald-100 text-xs mt-0.5">ลุ้นผู้สมัครเลื่อนเสาสูงรับพลังคะแนนเสียง โรงเรียนบ้านโนนสมบูรณ์</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2 w-full sm:w-auto">
+                    <button onclick="startCountingSession()" class="bg-amber-500 hover:bg-amber-400 text-white font-extrabold px-5 py-2.5 rounded-2xl text-sm shadow-md transition transform active:scale-95 flex-1 sm:flex-initial">
+                        <i class="fa-solid fa-rotate-left mr-1"></i> เริ่มต้นนับผลใหม่
+                    </button>
+                    <button onclick="showPage('home')" class="bg-white/20 hover:bg-white/30 text-white font-bold px-4 py-2.5 rounded-2xl text-sm transition flex-1 sm:flex-initial">
+                        <i class="fa-solid fa-house mr-1"></i> หน้าหลัก
+                    </button>
+                </div>
+            </div>
+
+            <!-- ALL-IN-ONE GAME BOARD CONTAINER -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                
+                <!-- LEFT SIDE (65%): Cute Vertical Pedestal Arena -->
+                <div class="lg:col-span-8 bg-sky-100 rounded-3xl p-6 border-4 border-sky-200 shadow-lg flex flex-col justify-between relative overflow-hidden min-h-[500px]">
+                    <!-- Clouds decoration back -->
+                    <div class="absolute top-4 left-10 text-white/40 text-4xl opacity-30"><i class="fa-solid fa-cloud"></i></div>
+                    <div class="absolute top-16 right-20 text-white/40 text-5xl opacity-40"><i class="fa-solid fa-cloud"></i></div>
+                    <div class="absolute bottom-20 left-1/3 text-white/30 text-3xl opacity-20"><i class="fa-solid fa-cloud"></i></div>
+                    
+                    <!-- Racing Track Finished Line Boundary flag (Vertical Top) -->
+                    <div class="absolute top-14 inset-x-0 h-1 border-t-2 border-dashed border-red-400/80 z-10 flex justify-between items-center px-4">
+                        <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm border border-white">FINISH LINE 🏆</span>
+                    </div>
+
+                    <!-- Stage Arena Layout -->
+                    <div class="w-full h-[400px] mt-10 relative flex justify-around items-end z-20" id="racing-tracks-container">
+                        <div class="text-slate-400 text-center py-20 font-medium">
+                            🌿 กรุณากดปุ่ม "เริ่มต้นนับผลใหม่" ทางขวา เพื่อเริ่มยกแท่นประชันผู้สมัครรับพลังเลเวลอัป!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT SIDE (35%): 3D Card TCG Card Revealer & Actions -->
+                <div class="lg:col-span-4 flex flex-col space-y-4">
+                    
+                    <!-- 3D Flippable Box display Card -->
+                    <div class="bg-slate-900 rounded-3xl p-6 flex flex-col justify-center items-center relative overflow-hidden shadow-xl min-h-[250px] border-4 border-slate-800">
+                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-950/40 via-slate-900 to-slate-950 z-0"></div>
+                        <div class="z-10 space-y-4 w-full text-center">
+                            <div>
+                                <span class="text-emerald-400 text-xs font-bold uppercase tracking-widest block" id="ballot-meta-label">ซองบัตรเลือกตั้ง</span>
+                                <span class="text-slate-300 text-xs font-medium" id="ballot-voter-label">รอเริ่มเกมนับคะแนน</span>
+                            </div>
+
+                            <!-- 3D Deck Perspective Container -->
+                            <div class="perspective-container w-full h-40 flex justify-center items-center">
+                                <div class="flip-card-inner w-32 h-40 relative cursor-pointer" id="arena-flippable-card">
+                                    <!-- Front: Cozy Envelope envelope -->
+                                    <div class="flip-card-front bg-gradient-to-br from-teal-500 to-emerald-600 border-2 border-white/30 flex flex-col items-center justify-center text-white shadow-xl p-2">
+                                        <i class="fa-solid fa-envelope-open text-3xl mb-1 animate-pulse"></i>
+                                        <span class="text-[10px] uppercase font-bold tracking-wider text-teal-100">บ้านโนนสมบูรณ์</span>
+                                    </div>
+                                    <!-- Back: Revealed Character Portrait TCG result -->
+                                    <div class="flip-card-back bg-white border-4 border-emerald-500 flex flex-col items-center justify-between text-slate-900 shadow-xl p-2 text-center rounded-2xl overflow-hidden">
+                                        <div class="w-full h-24 overflow-hidden rounded-lg bg-slate-50 border shadow-inner">
+                                            <img id="reveal-candidate-img" src="" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x150?text=LOGO'">
+                                        </div>
+                                        <span class="text-emerald-700 text-xs font-black" id="reveal-candidate-name">เบอร์ X</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel Actions buttons and controllers Console -->
+                    <div class="bg-white rounded-3xl border border-slate-200 p-5 space-y-4 shadow-sm flex-grow flex flex-col justify-between">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center text-xs text-slate-500 font-bold px-1">
+                                <span>ความคืบหน้าการเปิดบัตร</span>
+                                <span id="arena-progress-percent">0%</span>
+                            </div>
+                            <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden border">
+                                <div id="arena-progress-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 pt-2 text-center text-xs font-bold">
+                                <div class="p-2 bg-slate-50 rounded-xl"><span class="text-slate-400 block font-normal">ทั้งหมด</span><span id="arena-total-ballots" class="text-slate-700 text-sm">0 ใบ</span></div>
+                                <div class="p-2 bg-emerald-50 text-emerald-700 rounded-xl"><span class="text-emerald-500 block font-normal">เปิดแล้ว</span><span id="arena-opened-ballots" class="text-sm">0 ใบ</span></div>
+                                <div class="p-2 bg-amber-50 text-amber-700 rounded-xl"><span class="text-amber-500 block font-normal">เหลืออยู่</span><span id="arena-pending-ballots" class="text-sm">0 ใบ</span></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-4">
+                            <button onclick="drawNextBallots()" id="btn-draw-next" disabled class="w-full bg-emerald-600 hover:bg-emerald-500 text-white disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed py-3 rounded-2xl font-black shadow-md transition transform active:scale-95 flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-envelope-open-text"></i>
+                                <span>เปิดบัตรใบถัดไป</span>
+                            </button>
+                            <button onclick="toggleAutoPlayCounting()" id="btn-auto-play" disabled class="w-full bg-slate-800 hover:bg-slate-700 text-white disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed py-2.5 rounded-2xl text-xs font-bold transition flex items-center justify-center space-x-1">
+                                <i class="fa-solid fa-play"></i>
+                                <span id="auto-play-label">เปิดนับผลอัตโนมัติ (Auto Play)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- PAGE 5: Admin Dashboard (Backend) -->
+        <section id="page-admin" class="hidden space-y-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 pb-5 gap-4">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-slate-800">ระบบจัดการหลังบ้านผู้ดูแลระบบ</h2>
+                    <p class="text-slate-500 text-sm mt-1">ควบคุม จัดการรายชื่อผู้มีสิทธิ์ และข้อมูลผู้สมัคร</p>
+                </div>
+                <div class="flex items-center space-x-2 self-stretch sm:self-auto">
+                    <button onclick="showPage('home')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-semibold transition duration-150 flex-1 sm:flex-initial text-center">
+                        <i class="fa-solid fa-house mr-1"></i> กลับหน้าหลัก
+                    </button>
+                    <button onclick="logoutAdmin()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-4 py-2 rounded-xl text-sm font-semibold transition duration-150 flex-1 sm:flex-initial text-center">
+                        <i class="fa-solid fa-right-from-bracket mr-1"></i> ออกจากระบบ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Menu -->
+            <div class="flex border-b border-slate-200">
+                <button onclick="switchAdminTab('students')" id="tab-btn-students" class="px-6 py-3 border-b-2 border-indigo-600 text-indigo-600 font-bold text-sm focus:outline-none transition">
+                    <i class="fa-solid fa-users-gear mr-2"></i>จัดการรายชื่อผู้มีสิทธิ์เลือกตั้ง
+                </button>
+                <button onclick="switchAdminTab('candidates')" id="tab-btn-candidates" class="px-6 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700 font-bold text-sm focus:outline-none transition">
+                    <i class="fa-solid fa-user-tie mr-2"></i>จัดการรายชื่อผู้สมัครเลือกตั้ง
+                </button>
+                <button onclick="switchAdminTab('logs')" id="tab-btn-logs" class="px-6 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700 font-bold text-sm focus:outline-none transition">
+                    <i class="fa-solid fa-receipt mr-2"></i>รายงานและประวัติการโหวต
+                </button>
+            </div>
+
+            <!-- Tab 1: Manage Students List -->
+            <div id="tab-content-students" class="space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+                    <div class="relative flex-grow max-w-md">
+                        <input type="text" id="admin-search-student" oninput="renderAdminStudents()" placeholder="ค้นหารายชื่อนักเรียน..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <span class="absolute left-3 top-3 text-slate-400"><i class="fa-solid fa-magnifying-glass text-sm"></i></span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="openStudentModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm transition flex-1 sm:flex-none flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-plus"></i> <span>เพิ่มรายชื่อนักเรียน</span>
+                        </button>
+                        <button onclick="triggerDeleteAllStudents()" class="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm transition flex-1 sm:flex-none flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-trash-can"></i> <span>ลบรายชื่อนักเรียนทั้งหมด</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200 text-left">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">ชั้น</th>
+                                    <th scope="col" class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">เลขที่</th>
+                                    <th scope="col" class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">ชื่อ-นามสกุล</th>
+                                    <th scope="col" class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">สถานะการใช้สิทธิ์</th>
+                                    <th scope="col" class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 bg-white" id="admin-student-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Manage Candidates List -->
+            <div id="tab-content-candidates" class="hidden space-y-6">
+                <div class="flex justify-end">
+                    <button onclick="openCandidateModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm transition flex items-center space-x-1">
+                        <i class="fa-solid fa-plus"></i> <span>เพิ่มผู้สมัครเลือกตั้ง</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="admin-candidate-grid">
+                </div>
+            </div>
+
+            <!-- Tab 3: Detailed Logs -->
+            <div id="tab-content-logs" class="hidden space-y-6">
+                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-slate-800">ประวัติการลงคะแนนเข้าระบบ</h3>
+                        <span class="text-xs text-slate-400">บันทึกเรียลไทม์เพื่อตรวจสอบความโปร่งใส</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200 text-left">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">ลำดับ</th>
+                                    <th scope="col" class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">ชื่อนักเรียน</th>
+                                    <th scope="col" class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">ชั้น/เลขที่</th>
+                                    <th scope="col" class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">ผู้สมัครที่โหวต</th>
+                                    <th scope="col" class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">วันและเวลาที่ลงคะแนน</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 bg-white" id="admin-logs-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- App Footer -->
+    <footer class="bg-white border-t border-slate-100 py-6 text-center text-xs text-slate-400">
+        <p>© 2026 โรงเรียนบ้านโนนสมบูรณ์ สพป.อุบลราชธานี เขต 4. All rights reserved.</p>
+        <p class="mt-1 font-medium">ระบบเลือกตั้งจำลองเพื่อการศึกษา ประสิทธิภาพสูงและเสถียร</p>
+    </footer>
+
+    <!-- MODAL 1: General Notification -->
+    <div id="modal-alert" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4 animate-scale-up">
+            <div id="modal-alert-icon-container" class="inline-flex p-3 rounded-full text-blue-600 bg-blue-50">
+                <i id="modal-alert-icon" class="fa-solid fa-circle-info text-3xl"></i>
+            </div>
+            <div class="space-y-1">
+                <h4 id="modal-alert-title" class="text-lg font-bold text-slate-800">หัวข้อแจ้งเตือน</h4>
+                <p id="modal-alert-message" class="text-slate-500 text-sm">รายละเอียดเนื้อหาข้อความแสดงสถานะต่าง ๆ ของระบบ</p>
+            </div>
+            <button onclick="closeAlertModal()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition duration-150">
+                ตกลง
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Admin Password Dialog -->
+    <div id="modal-admin-login" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+            <div class="text-center space-y-2">
+                <div class="inline-flex p-3 bg-indigo-50 text-indigo-600 rounded-full">
+                    <i class="fa-solid fa-lock text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-800">เข้าถึงระบบผู้ดูแล</h3>
+                <p class="text-slate-500 text-xs">กรุณาใส่รหัสผ่านแอดมินเพื่อดำเนินการต่อ</p>
+            </div>
+            <div class="space-y-4">
+                <input type="password" id="admin-pass-input" placeholder="รหัสผ่านผู้ดูแลระบบ" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <div class="flex space-x-2">
+                    <button onclick="closeAdminLoginModal()" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition">
+                        ยกเลิก
+                    </button>
+                    <button onclick="submitAdminPassword()" class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition">
+                        ตกลง
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Confirm Clean/Action Dialog -->
+    <div id="modal-confirm" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl text-center space-y-5">
+            <div id="modal-confirm-icon-container" class="inline-flex p-3 bg-rose-50 text-rose-600 rounded-full">
+                <i id="modal-confirm-icon" class="fa-solid fa-triangle-exclamation text-3xl"></i>
+            </div>
+            <div class="space-y-2">
+                <h4 id="modal-confirm-title" class="text-xl font-bold text-slate-800">ยืนยันการทำรายการหรือไม่?</h4>
+                <p id="modal-confirm-message" class="text-slate-500 text-sm">การดำเนินการนี้จะไม่สามารถย้อนกลับคืนข้อมูลได้ โปรดตรวจสอบความรอบคอบก่อนตัดสินใจ</p>
+            </div>
+            <div class="flex space-x-3">
+                <button id="btn-confirm-cancel" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition">
+                    ยกเลิก
+                </button>
+                <button id="btn-confirm-ok" class="w-1/2 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-sm transition">
+                    ยืนยันการลบ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: Student Add/Edit Modal -->
+    <div id="modal-student-form" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+            <h3 class="text-lg font-bold text-slate-800" id="student-modal-title">จัดการข้อมูลนักเรียน</h3>
+            <input type="hidden" id="student-modal-id">
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อ - สกุล</label>
+                    <input type="text" id="student-modal-name" placeholder="เด็กชายสมรัก ทรหด" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ชั้น</label>
+                        <input type="text" id="student-modal-grade" placeholder="ม.3" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">เลขที่</label>
+                        <input type="number" id="student-modal-no" placeholder="1" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+            </div>
+            <div class="flex space-x-2">
+                <button onclick="closeStudentModal()" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition">ยกเลิก</button>
+                <button onclick="saveStudentForm()" class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition">บันทึก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: Candidate Add/Edit Modal -->
+    <div id="modal-candidate-form" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <h3 class="text-lg font-bold text-slate-800" id="candidate-modal-title">จัดการข้อมูลผู้สมัครเลือกตั้ง</h3>
+            <input type="hidden" id="candidate-modal-id">
+            <div class="space-y-3">
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="col-span-1">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">หมายเลข</label>
+                        <input type="number" id="candidate-modal-no" placeholder="1" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อ - สกุล ผู้สมัคร</label>
+                        <input type="text" id="candidate-modal-name" placeholder="เด็กชายสมพงษ์ ยอดประธาน" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">ลิงก์รูปภาพ / ไฟล์ GIF โปรไฟล์ตัวการ์ตูน</label>
+                    <input type="text" id="candidate-modal-img" placeholder="https://... (สามารถใส่ลิงก์ภาพเคลื่อนไหว .gif ได้)" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">นโยบายในการพัฒนาโรงเรียน</label>
+                    <textarea id="candidate-modal-policy" rows="3" placeholder="ระบุวิสัยทัศน์หรือนโยบายหาเสียงของผู้สมัคร..." class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+                </div>
+            </div>
+            <div class="flex space-x-2">
+                <button onclick="closeCandidateModal()" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition">ยกเลิก</button>
+                <button onclick="saveCandidateForm()" class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition">บันทึก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 6: Cast Vote Completion (3 Seconds Countdown) -->
+    <div id="modal-vote-complete" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-indigo-900/90 backdrop-blur-md p-4">
+        <div class="text-center text-white space-y-6 max-w-sm w-full">
+            <div class="inline-flex p-5 bg-emerald-500 text-white rounded-full animate-pulse shadow-2xl">
+                <i class="fa-solid fa-heart-circle-check text-5xl"></i>
+            </div>
+            <div class="space-y-2">
+                <h3 class="text-3xl font-extrabold tracking-tight">บันทึกคะแนนเรียบร้อย!</h3>
+                <p class="text-indigo-200 text-lg">ขอบคุณที่ใช้สิทธิ์ในการเลือกตั้งครั้งนี้</p>
+            </div>
+            <div class="inline-flex items-center justify-center h-16 w-16 rounded-full border-4 border-indigo-400 border-t-white animate-spin"></div>
+            <p class="text-xs text-indigo-300">ระบบจะทำการนำคุณกลับสู่หน้าหลักอัตโนมัติภายใน <span id="countdown-num" class="font-bold text-white text-sm">3</span> วินาที</p>
+        </div>
+    </div>
+
+    <!-- MODAL 7: Cozy Cute Winner Celebration (Requested Feature) -->
+    <div id="modal-winner" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl text-center space-y-6 transform scale-95 transition-all duration-300 border-4 border-amber-400 relative overflow-hidden">
+            <!-- Decorative soft glowing backgrounds -->
+            <div class="absolute -top-10 -left-10 w-32 h-32 bg-yellow-200 rounded-full blur-2xl opacity-50"></div>
+            <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-emerald-200 rounded-full blur-2xl opacity-50"></div>
+
+            <div class="space-y-1 relative z-10">
+                <span class="inline-block bg-amber-100 text-amber-800 font-black text-xs px-4 py-1.5 rounded-full uppercase tracking-wider animate-bounce">
+                    🎉 ยินดีด้วยกับประธานนักเรียนคนใหม่ 🎉
+                </span>
+                <h3 class="text-2xl font-black text-slate-800">ผลการเลือกตั้งอย่างเป็นทางการ</h3>
+            </div>
+
+            <!-- Winner visual card display -->
+            <div class="flex flex-col items-center justify-center space-y-4 relative z-10">
+                <div class="relative">
+                    <!-- Crown icon on top of winning profile image -->
+                    <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-amber-500 text-4xl drop-shadow animate-pulse">
+                        <i class="fa-solid fa-crown"></i>
+                    </div>
+                    <img id="winner-profile-img" src="" class="h-44 w-36 rounded-2xl object-cover border-4 border-amber-400 shadow-2xl bg-white" onerror="this.src='https://placehold.co/200x200?text=WINNER'">
+                    <span id="winner-number-badge" class="absolute bottom-1 right-2 bg-indigo-600 text-white font-black text-lg h-9 w-9 rounded-full flex items-center justify-center border-4 border-white shadow">
+                        X
+                    </span>
+                </div>
+
+                <div class="space-y-1">
+                    <h4 id="winner-name-text" class="text-xl font-extrabold text-slate-900">ผู้ชนะการเลือกตั้ง</h4>
+                    <p id="winner-score-text" class="text-indigo-600 font-extrabold text-sm">คะแนนรวมสูงสุด: X คะแนน</p>
+                </div>
+
+                <p id="winner-policy-text" class="text-slate-500 text-xs italic max-w-sm px-4">"นโยบายหาเสียง"</p>
+            </div>
+
+            <div class="flex space-x-3 pt-2 relative z-10">
+                <button onclick="triggerConfettiShower()" class="w-1/2 py-2.5 bg-amber-500 hover:bg-amber-400 text-white font-bold rounded-2xl shadow transition transform active:scale-95 flex items-center justify-center space-x-1 text-sm">
+                    <i class="fa-solid fa-fire-burner"></i>
+                    <span>ยิงพลุฉลองอีกรอบ</span>
+                </button>
+                <button onclick="closeWinnerModal()" class="w-1/2 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-2xl text-sm transition">
+                    ปิดหน้าต่าง
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Modular Scripts Integration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        // Configuration setup
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'school-vote-2569';
+        const defaultFirebaseConfig = {
+            apiKey: "",
+            authDomain: "mock-environment.firebaseapp.com",
+            projectId: "mock-environment",
+            storageBucket: "mock-environment.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:123:web:abc"
+        };
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : defaultFirebaseConfig;
+
+        // Initialize Firebase instances
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // State variables
+        let currentUser = null;
+        let selectedVote = null;
+        let chartInstance = null;
+
+        let globalVoters = [];
+        let globalCandidates = [];
+        let globalVotes = [];
+
+        let unsubscribeVoters = null;
+        let unsubscribeCandidates = null;
+        let unsubscribeVotes = null;
+
+        // Custom Candidate Palette Configurator (Requested Feature for stand-out colors)
+        const getCandidatePalette = (no) => {
+            const palettes = {
+                1: {
+                    gradient: "from-rose-500 to-orange-500",
+                    border: "border-rose-400",
+                    shadow: "shadow-rose-500/50",
+                    bgLight: "bg-rose-50",
+                    text: "text-rose-600",
+                    accent: "accent-rose-500",
+                    solid: "#f43f5e"
+                },
+                2: {
+                    gradient: "from-cyan-500 to-blue-600",
+                    border: "border-cyan-400",
+                    shadow: "shadow-cyan-500/50",
+                    bgLight: "bg-cyan-50",
+                    text: "text-cyan-600",
+                    accent: "accent-cyan-500",
+                    solid: "#06b6d4"
+                },
+                3: {
+                    gradient: "from-emerald-400 to-teal-600",
+                    border: "border-emerald-400",
+                    shadow: "shadow-emerald-500/50",
+                    bgLight: "bg-emerald-50",
+                    text: "text-emerald-600",
+                    accent: "accent-emerald-500",
+                    solid: "#10b981"
+                },
+                4: {
+                    gradient: "from-amber-400 to-fuchsia-600",
+                    border: "border-amber-300",
+                    shadow: "shadow-fuchsia-500/50",
+                    bgLight: "bg-fuchsia-50",
+                    text: "text-fuchsia-600",
+                    accent: "accent-fuchsia-500",
+                    solid: "#d946ef"
+                }
+            };
+            return palettes[no] || {
+                gradient: "from-indigo-500 to-purple-600",
+                border: "border-indigo-400",
+                shadow: "shadow-indigo-500/50",
+                bgLight: "bg-indigo-50",
+                text: "text-indigo-600",
+                accent: "accent-indigo-500",
+                solid: "#6366f1"
+            };
+        };
+
+        // Web Audio API Audio Synthesizer (No external file needed)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const playSynthSound = (type) => {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'tick') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+                } else if (type === 'reveal') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08);
+                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.16);
+                    osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.24);
+                    gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.45);
+                } else if (type === 'winner') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.15);
+                    osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+                } else if (type === 'powerup') {
+                    // Rising magic sci-fi power up sound (Requested Feature)
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(250, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.6);
+                    gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+                }
+            } catch (e) { console.warn(e); }
+        };
+
+        // Counting Presentation variables
+        let countingQueue = [];
+        let currentQueueIndex = 0;
+        let countingScores = {};
+        let autoPlayInterval = null;
+        let isCardTransitioning = false;
+
+        const initAuthentication = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) { console.error(err); }
+        };
+
+        const setupRealtimeListeners = (user) => {
+            if (!user) return;
+            if (unsubscribeVoters) unsubscribeVoters();
+            if (unsubscribeCandidates) unsubscribeCandidates();
+            if (unsubscribeVotes) unsubscribeVotes();
+
+            const votersCollection = collection(db, 'artifacts', appId, 'public', 'data', 'voters');
+            const candidatesCollection = collection(db, 'artifacts', appId, 'public', 'data', 'candidates');
+            const votesCollection = collection(db, 'artifacts', appId, 'public', 'data', 'votes');
+
+            unsubscribeVoters = onSnapshot(votersCollection, async (snapshot) => {
+                let voters = [];
+                snapshot.forEach(doc => { voters.push({ id: doc.id, ...doc.data() }); });
+                if (voters.length === 0 && snapshot.metadata.fromCache === false) {
+                    await seedInitialVoters();
+                } else {
+                    globalVoters = voters.sort((a, b) => {
+                        if (a.grade === b.grade) return a.roomNo - b.roomNo;
+                        return a.grade.localeCompare(b.grade);
+                    });
+                    renderVoterSelector();
+                    renderAdminStudents();
+                    updateStatisticalPanels();
+                }
+            });
+
+            unsubscribeCandidates = onSnapshot(candidatesCollection, async (snapshot) => {
+                let candidates = [];
+                snapshot.forEach(doc => { candidates.push({ id: doc.id, ...doc.data() }); });
+                if (candidates.length === 0 && snapshot.metadata.fromCache === false) {
+                    await seedInitialCandidates();
+                } else {
+                    globalCandidates = candidates.sort((a, b) => a.no - b.no);
+                    renderBallotOptions();
+                    renderAdminCandidates();
+                    updateStatisticalPanels();
+                }
+            });
+
+            unsubscribeVotes = onSnapshot(votesCollection, (snapshot) => {
+                let votes = [];
+                snapshot.forEach(doc => { votes.push({ id: doc.id, ...doc.data() }); });
+                globalVotes = votes;
+                renderDetailedLogs();
+                updateStatisticalPanels();
+            });
+        };
+
+        // Database Seeds (31 Default Voters)
+        const defaultVotersSeed = [
+            { name: "เด็กชายกิตติศักดิ์ มีดี", grade: "ม.3", roomNo: 1 },
+            { name: "เด็กหญิงกรกนก รักดี", grade: "ม.3", roomNo: 2 },
+            { name: "เด็กชายจิรพัฒน์ สุขใจ", grade: "ม.3", roomNo: 3 },
+            { name: "เด็กชายชลสิทธิ์ แสนสุข", grade: "ม.3", roomNo: 4 },
+            { name: "เด็กหญิงณัฐธิดา ใฝ่เรียน", grade: "ม.3", roomNo: 5 },
+            { name: "เด็กชายทศพล ทรงพลัง", grade: "ม.1", roomNo: 1 },
+            { name: "เด็กหญิงธนภรณ์ สอนธรรม", grade: "ม.1", roomNo: 2 },
+            { name: "เด็กหญิงนภัสสร อ่อนน้อม", grade: "ม.1", roomNo: 3 },
+            { name: "เด็กชายปองภพ ยอดรัก", grade: "ม.2", roomNo: 1 },
+            { name: "เด็กหญิงปิยธิดา สดใส", grade: "ม.2", roomNo: 2 },
+            { name: "เด็กชายพงศกร ขยันงาน", grade: "ม.2", roomNo: 3 },
+            { name: "เด็กหญิงพรพิมล กตัญญู", grade: "ป.6", roomNo: 1 },
+            { name: "เด็กชายพีรภัทร อดทน", grade: "ป.6", roomNo: 2 },
+            { name: "เด็กหญิงภัทรวดี ยิ้มแย้ม", grade: "ป.6", roomNo: 3 },
+            { name: "เด็กชายภูริณัฐ เรียนดี", grade: "ป.6", roomNo: 4 },
+            { name: "เด็กหญิงมนัสนันท์ งามตา", grade: "ป.5", roomNo: 1 },
+            { name: "เด็กชายเมธาสิทธิ์ กล้าหาญ", grade: "ป.5", roomNo: 2 },
+            { name: "เด็กหญิงรุ่งนภา พากเพียร", grade: "ป.5", roomNo: 3 },
+            { name: "เด็กหญิงวรรณิษา ใจงาม", grade: "ป.4", roomNo: 1 },
+            { name: "เด็กชายศรัญญู สู้ชีวิต", grade: "ป.4", roomNo: 2 },
+            { name: "เด็กชายศุภณัฐ เก่งกล้า", grade: "ป.4", roomNo: 3 },
+            { name: "เด็กหญิงสโรชา บานแย้ม", grade: "ป.3", roomNo: 1 },
+            { name: "เด็กชายอนันดา ทัศนา", grade: "ป.3", roomNo: 2 },
+            { name: "เด็กหญิงอภิชญา สุภาพ", grade: "ป.2", roomNo: 1 },
+            { name: "เด็กชายอัครพงษ์ สว่างจิต", grade: "ป.2", roomNo: 2 },
+            { name: "เด็กหญิงอัญชลี รักษ์วินัย", grade: "ป.1", roomNo: 1 },
+            { name: "เด็กชายอัษฎาวุฒิ ขยันเพียร", grade: "ป.1", roomNo: 2 },
+            { name: "เด็กหญิงอาทิตยา เลิศล้ำ", grade: "ม.3", roomNo: 6 },
+            { name: "เด็กชายอิทธิพล สัจจะ", grade: "ม.2", roomNo: 4 },
+            { name: "เด็กหญิงอุมาพร พรประเสริฐ", grade: "ม.1", roomNo: 4 },
+            { name: "เด็กหญิงไอรดา แสนสุข", grade: "ป.6", roomNo: 5 }
+        ];
+
+        const defaultCandidatesSeed = [
+            { no: 1, name: "เบอร์ 1", img: "https://img2.pic.in.th/tempImageMXRaQs.jpg", policy: "โรงเรียนสะอาด ปราศจากขยะ ห้องเรียนน่าอยู่ น่าเรียน" },
+            { no: 2, name: "เบอร์ 2", img: "https://img1.pic.in.th/images/tempImageTOGP5z.jpg", policy: "เคารพซึ่งกันและกัน ยิ้มง่าย ไหว้สวย รวยน้ำใจ" },
+            { no: 3, name: "เบอร์ 3", img: "https://img1.pic.in.th/images/tempImageYPVcn1.jpg", policy: "มีระเบียบ มีวินัย ใส่ใจคุณธรรม" },
+            { no: 4, name: "เบอร์ 4", img: "https://img1.pic.in.th/images/tempImage79u1q6.jpg", policy: "เข้าแถวเป็นระเบียบ ตรงต่อเวลา รักษาวินัย" }
+        ];
+
+        const seedInitialVoters = async () => {
+            if (!currentUser) return;
+            const batch = writeBatch(db);
+            defaultVotersSeed.forEach((item, index) => {
+                const docId = `voter_${index + 1}`;
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voters', docId);
+                batch.set(docRef, { name: item.name, grade: item.grade, roomNo: parseInt(item.roomNo), voted: false });
+            });
+            await batch.commit();
+        };
+
+        const seedInitialCandidates = async () => {
+            if (!currentUser) return;
+            const batch = writeBatch(db);
+            defaultCandidatesSeed.forEach((item) => {
+                const docId = `candidate_${item.no}`;
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'candidates', docId);
+                batch.set(docRef, { no: parseInt(item.no), name: item.name, img: item.img, policy: item.policy });
+            });
+            await batch.commit();
+        };
+
+        // Render Selector with Class filter support
+        const renderVoterSelector = () => {
+            const select = document.getElementById('voter-select');
+            const classFilter = document.getElementById('voter-class-filter');
+            const searchVal = document.getElementById('voter-search').value.toLowerCase().trim();
+            
+            const selectedClass = classFilter.value;
+            const uniqueClasses = [...new Set(globalVoters.map(v => v.grade))].sort((a, b) => a.localeCompare(b));
+            
+            const existingOptions = Array.from(classFilter.options).map(o => o.value).filter(v => v !== "");
+            if (JSON.stringify(existingOptions) !== JSON.stringify(uniqueClasses)) {
+                classFilter.innerHTML = '<option value="">-- แสดงทุกชั้นเรียน --</option>';
+                uniqueClasses.forEach(cName => {
+                    const opt = document.createElement('option');
+                    opt.value = cName; opt.textContent = `ชั้น ${cName}`;
+                    classFilter.appendChild(opt);
+                });
+                if (uniqueClasses.includes(selectedClass)) classFilter.value = selectedClass;
+            }
+
+            const activeClass = classFilter.value;
+            const currentSelected = select.value;
+            select.innerHTML = '<option value="">-- กรุณาเลือกรายชื่อ --</option>';
+            
+            const filtered = globalVoters.filter(student => {
+                const matchClassFilter = activeClass === "" || student.grade === activeClass;
+                const matchSearch = student.name.toLowerCase().includes(searchVal) || student.grade.toLowerCase().includes(searchVal);
+                return matchClassFilter && matchSearch;
+            });
+
+            filtered.forEach(voter => {
+                const opt = document.createElement('option');
+                opt.value = voter.id;
+                opt.textContent = `${voter.name} (ชั้น ${voter.grade} เลขที่ ${voter.roomNo}) ${voter.voted ? '❌ [ใช้สิทธิ์แล้ว]' : '🗳️ [ยังไม่ได้ใช้สิทธิ์]'}`;
+                select.appendChild(opt);
+            });
+            if (currentSelected) select.value = currentSelected;
+        };
+
+        window.filterVoterDropdown = () => { renderVoterSelector(); };
+
+        window.processVoterLogin = () => {
+            const selectVal = document.getElementById('voter-select').value;
+            if (!selectVal) {
+                showCustomAlert("ข้อผิดพลาด", "โปรดเลือกรายชื่อนักเรียนของคุณก่อนเข้าสู่ระบบ", "fa-triangle-exclamation", "text-rose-500 bg-rose-50");
+                return;
+            }
+            const voterData = globalVoters.find(v => v.id === selectVal);
+            if (!voterData) return;
+            if (voterData.voted) {
+                showCustomAlert("ท่านใช้สิทธิ์ไปแล้ว", `รายชื่อ "${voterData.name}" ได้ลงคะแนนเรียบร้อยแล้ว`, "fa-user-lock", "text-amber-500 bg-amber-50");
+                return;
+            }
+            window.activeVoter = voterData;
+            selectedVote = null;
+            document.getElementById('current-voter-display').textContent = voterData.name;
+            document.getElementById('current-voter-sub').textContent = `ชั้น ${voterData.grade} / เลขที่ ${voterData.roomNo}`;
+            
+            document.querySelectorAll('.ballot-radio').forEach(r => r.checked = false);
+            document.querySelectorAll('.ballot-card').forEach(c => {
+                c.classList.remove('ring-4', 'ring-indigo-600', 'bg-indigo-50/50', 'border-indigo-200');
+                c.classList.add('bg-white', 'border-slate-200');
+            });
+            showPage('vote');
+        };
+
+        // Redesigned: Full portrait TCG collectible style ballot cards (Requested Feature)
+        window.renderBallotOptions = () => {
+            const grid = document.getElementById('ballot-grid');
+            grid.innerHTML = '';
+            globalCandidates.forEach(cand => {
+                const colors = getCandidatePalette(cand.no);
+                const card = document.createElement('div');
+                card.className = `ballot-card group cursor-pointer bg-white rounded-3xl border-2 border-slate-200 p-4 flex flex-col justify-between items-center text-center space-y-4 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 hover:${colors.border}`;
+                card.onclick = () => selectCandidate(cand.no, card);
+                card.innerHTML = `
+                    <div class="relative w-full overflow-hidden rounded-2xl bg-slate-50 border border-slate-100 shadow-inner" style="aspect-ratio: 3/4;">
+                        <img src="${cand.img}" alt="${cand.name}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105" onerror="this.src='https://placehold.co/300x400?text=เบอร์+${cand.no}'">
+                        <!-- Custom Ribbon badge for Candidate Number -->
+                        <span class="absolute top-3 left-3 bg-gradient-to-r ${colors.gradient} text-white font-extrabold text-xs px-4 py-1.5 rounded-full shadow-lg border-2 border-white">
+                            เบอร์ ${cand.no}
+                        </span>
+                    </div>
+                    <div class="space-y-1 w-full">
+                        <h4 class="font-extrabold text-lg text-slate-800">${cand.name}</h4>
+                        <p class="text-xs text-indigo-600 font-medium">นโยบายของผู้สมัคร</p>
+                        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 min-h-[70px] flex items-center justify-center">
+                            <p class="text-xs text-slate-600 italic leading-relaxed">"${cand.policy}"</p>
+                        </div>
+                    </div>
+                    <div class="w-full pt-1">
+                        <label class="inline-flex items-center justify-center space-x-2 cursor-pointer w-full py-2.5 rounded-xl hover:opacity-90 transition shadow-sm bg-gradient-to-r ${colors.gradient} text-white font-bold text-sm">
+                            <input type="radio" name="ballot-choice" class="ballot-radio text-indigo-600 focus:ring-indigo-500 h-5 w-5 accent-indigo-600" value="${cand.no}">
+                            <span>เลือกหมายเลข ${cand.no}</span>
+                        </label>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        };
+
+        window.selectCandidate = (no, cardElement) => {
+            selectedVote = no;
+            document.querySelectorAll('.ballot-card').forEach(c => {
+                c.classList.remove('ring-4', 'ring-indigo-600', 'bg-indigo-50/50', 'border-indigo-200');
+                c.classList.add('bg-white', 'border-slate-200');
+            });
+            cardElement.classList.add('ring-4', 'ring-indigo-600', 'bg-indigo-50/50', 'border-indigo-200');
+            cardElement.classList.remove('bg-white', 'border-slate-200');
+            const radio = cardElement.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
+        };
+
+        // Confirm voting process with modern Green/Emerald confirmation dialog
+        window.confirmBallot = async () => {
+            if (!currentUser) return;
+            if (!selectedVote) {
+                showCustomAlert("ข้อผิดพลาด", "โปรดเลือกหมายเลขผู้สมัครที่คุณต้องการลงคะแนน", "fa-triangle-exclamation", "text-rose-500 bg-rose-50");
+                return;
+            }
+            if (!window.activeVoter) return;
+
+            const currentVoterId = window.activeVoter.id;
+            const currentVoterName = window.activeVoter.name;
+
+            showCustomConfirm("ยืนยันลงสิทธิ์คะแนน", `ต้องการยืนยันการลงคะแนนเลือกผู้สมัคร เบอร์ ${selectedVote} ในฐานะ "${currentVoterName}" ใช่หรือไม่ (หลังยืนยันแล้วจะไม่สามารถแก้ไขได้)`, async () => {
+                try {
+                    const voterDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'voters', currentVoterId);
+                    const freshDoc = await getDoc(voterDocRef);
+                    if (freshDoc.exists() && freshDoc.data().voted) {
+                        showCustomAlert("เกิดข้อผิดพลาด", "สิทธิ์โหวตนี้ถูกใช้ไปเรียบร้อยแล้ว", "fa-triangle-exclamation", "text-rose-500 bg-rose-50");
+                        showPage('home'); return;
+                    }
+
+                    const voteRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'votes'));
+                    await setDoc(voteRef, {
+                        voterId: currentVoterId, voterName: currentVoterName,
+                        voterClass: `${window.activeVoter.grade}/${window.activeVoter.roomNo}`,
+                        candidateNo: selectedVote, timestamp: new Date().toLocaleString('th-TH')
+                    });
+
+                    await updateDoc(voterDocRef, { voted: true });
+                    triggerVoteSuccessModal();
+                } catch (error) {
+                    showCustomAlert("บันทึกคะแนนไม่สำเร็จ", "มีปัญหากับเครือข่ายฐานข้อมูลกรุณาลองใหม่อีกครั้ง", "fa-triangle-exclamation", "text-rose-500 bg-rose-50");
+                }
+            }, "ยืนยัน", "emerald");
+        };
+
+        const triggerVoteSuccessModal = () => {
+            const modal = document.getElementById('modal-vote-complete');
+            const countdownSpan = document.getElementById('countdown-num');
+            modal.classList.remove('hidden');
+            let count = 3; countdownSpan.textContent = count;
+            const timer = setInterval(() => {
+                count--; countdownSpan.textContent = count;
+                if (count <= 0) {
+                    clearInterval(timer); modal.classList.add('hidden');
+                    window.activeVoter = null; selectedVote = null;
+                    document.getElementById('voter-select').value = "";
+                    document.getElementById('voter-search').value = "";
+                    showPage('home');
+                }
+            }, 1000);
+        };
+
+        // Smooth Counter Animation for stats
+        const updateStatisticalPanels = () => {
+            const totalVoters = globalVoters.length;
+            const votedCount = globalVotes.length;
+            const percent = totalVoters > 0 ? ((votedCount / totalVoters) * 100) : 0;
+
+            animateCountValue('stat-total-voters', totalVoters);
+            animateCountValue('stat-voted-count', votedCount);
+            
+            const statPercentEl = document.getElementById('stat-percent');
+            if (statPercentEl) {
+                let currentPercent = parseFloat(statPercentEl.textContent) || 0;
+                let step = (percent - currentPercent) / 20; let cycles = 0;
+                const percentTimer = setInterval(() => {
+                    currentPercent += step; statPercentEl.textContent = `${currentPercent.toFixed(2)}%`;
+                    if (++cycles >= 20) { clearInterval(percentTimer); statPercentEl.textContent = `${percent.toFixed(2)}%`; }
+                }, 15);
+            }
+
+            const resultsMap = {};
+            globalCandidates.forEach(cand => resultsMap[cand.no] = 0);
+            globalVotes.forEach(vote => { if (resultsMap[vote.candidateNo] !== undefined) resultsMap[vote.candidateNo]++; });
+            updateChartDisplay(resultsMap);
+        };
+
+        const animateCountValue = (elementId, targetVal) => {
+            const el = document.getElementById(elementId); if (!el) return;
+            const startVal = parseInt(el.textContent) || 0; if (startVal === targetVal) return;
+            let currentVal = startVal;
+            const stepTime = Math.max(Math.floor(500 / Math.abs(targetVal - startVal)), 15);
+            const increment = targetVal > startVal ? 1 : -1;
+            const timer = setInterval(() => {
+                currentVal += increment; el.textContent = currentVal;
+                if (currentVal === targetVal) clearInterval(timer);
+            }, stepTime);
+        };
+
+        const updateChartDisplay = (resultsMap) => {
+            const ctx = document.getElementById('realtimeChart');
+            const placeholderMsg = document.getElementById('no-candidates-msg');
+            if (globalCandidates.length === 0) {
+                placeholderMsg.classList.remove('hidden'); ctx.classList.add('hidden'); return;
+            }
+            placeholderMsg.classList.add('hidden'); ctx.classList.remove('hidden');
+            const labels = globalCandidates.map(c => `เบอร์ ${c.no}: ${c.name}`);
+            const dataValues = globalCandidates.map(c => resultsMap[c.no] || 0);
+
+            if (chartInstance) {
+                chartInstance.data.labels = labels; chartInstance.data.datasets[0].data = dataValues; chartInstance.update();
+            } else {
+                chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'คะแนนโหวตทั้งหมด', data: dataValues,
+                            backgroundColor: ['rgba(59, 130, 246, 0.85)', 'rgba(139, 92, 246, 0.85)', 'rgba(16, 185, 129, 0.85)', 'rgba(245, 158, 11, 0.85)'].slice(0, globalCandidates.length),
+                            borderColor: ['#2563eb', '#7c3aed', '#059669', '#d97706'].slice(0, globalCandidates.length),
+                            borderWidth: 2, borderRadius: 8
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            }
+        };
+
+        // ========================================================
+        // REDESIGNED FEATURE: VERTICAL PEDESTAL GAME COUNTING ARENA
+        // ========================================================
+        window.startCountingSession = () => {
+            if (autoPlayInterval) { clearInterval(autoPlayInterval); autoPlayInterval = null; document.getElementById('auto-play-label').textContent = "เปิดนับผลอัตโนมัติ (Auto Play)"; }
+            if (globalVotes.length === 0) { showCustomAlert("กล่องโหวตว่างเปล่า", "ยังไม่มีสิทธิ์เสียงลงคะแนนสะสมในระบบคลาวด์", "fa-box-open", "text-amber-600 bg-amber-50"); return; }
+
+            // Shuffle array stack items for maximum suspense fun
+            countingQueue = [...globalVotes].sort(() => Math.random() - 0.5);
+            currentQueueIndex = 0; isCardTransitioning = false;
+            countingScores = {}; globalCandidates.forEach(cand => countingScores[cand.no] = 0);
+
+            // Update text controllers
+            document.getElementById('arena-total-ballots').textContent = `${countingQueue.length} ใบ`;
+            document.getElementById('arena-opened-ballots').textContent = `0 ใบ`;
+            document.getElementById('arena-pending-ballots').textContent = `${countingQueue.length} ใบ`;
+            document.getElementById('arena-progress-percent').textContent = `0%`;
+            document.getElementById('arena-progress-bar').style.width = `0%`;
+
+            document.getElementById('arena-flippable-card').classList.remove('is-flipped');
+            document.getElementById('ballot-meta-label').textContent = "บัตรลงคะแนนรอนับ";
+            document.getElementById('ballot-voter-label').textContent = "กดปุ่มเพื่อเริ่มส่งตัวการ์ตูนออกวิ่ง!";
+
+            document.getElementById('btn-draw-next').disabled = false;
+            document.getElementById('btn-auto-play').disabled = false;
+
+            renderRacingTracks(); playSynthSound('winner');
+        };
+
+        // Render gorgeous vertical pedestals for each candidate (Requested feature)
+        const renderRacingTracks = () => {
+            const tracksContainer = document.getElementById('racing-tracks-container');
+            tracksContainer.innerHTML = '';
+            
+            tracksContainer.className = "w-full h-[400px] mt-10 relative flex justify-around items-end z-20 px-2";
+
+            globalCandidates.forEach(cand => {
+                const currentScore = countingScores[cand.no] || 0;
+                // Maximum pedestal height can rise to 70% to ensure enough safe space for labels & banners above
+                const progressPercent = countingQueue.length > 0 ? (currentScore / countingQueue.length) * 70 : 0;
+                const translationPercent = progressPercent;
+
+                const colors = getCandidatePalette(cand.no);
+
+                const col = document.createElement('div');
+                col.className = "relative flex flex-col justify-end items-center h-full flex-1 px-1";
+                col.innerHTML = `
+                    <!-- Score & Power Floating indicator text above candidates -->
+                    <div class="absolute z-30 transition-all duration-700 ease-out flex flex-col items-center" style="bottom: calc(${translationPercent}% + 145px);" id="floating-score-cand-${cand.no}">
+                        <!-- Magic Sparkle Level / Power Up Floating holder -->
+                        <div id="power-indicator-cand-${cand.no}" class="h-6 flex items-center justify-center"></div>
+                        <!-- Cute Custom Score Bubble -->
+                        <span class="bg-white text-slate-800 font-extrabold text-[10px] sm:text-xs px-2 py-0.5 rounded-full shadow-md border-2 ${colors.border} flex items-center space-x-1">
+                             <i class="fa-solid fa-star text-amber-500"></i>
+                             <span id="score-val-cand-${cand.no}">${currentScore} เสียง</span>
+                        </span>
+                    </div>
+
+                    <!-- Candidate Full Standing character profile standing on pedestal -->
+                    <div class="absolute z-20 transition-all duration-700 ease-out flex flex-col items-center" style="bottom: calc(${translationPercent}% + 10px);" id="runner-avatar-cand-${cand.no}">
+                        <div class="relative rounded-2xl overflow-visible p-1 group">
+                            <!-- Magic Power Glow Ring (Requested Feature) -->
+                            <div id="glow-ring-cand-${cand.no}" class="absolute -inset-1 bg-gradient-to-r ${colors.gradient} rounded-2xl blur-md opacity-0 transition-opacity duration-300"></div>
+                            
+                            <!-- Full portrait picture of candidates -->
+                            <img src="${cand.img}" class="h-28 w-20 sm:h-32 sm:w-24 rounded-xl object-cover border-4 border-white shadow-2xl relative bg-white transition-transform duration-300" onerror="this.src='https://placehold.co/150x200?text=${cand.no}'">
+                            
+                            <!-- Cute Signature Circle Label Number Badge -->
+                            <span class="absolute -top-3.5 -left-3.5 bg-gradient-to-r ${colors.gradient} text-white font-black text-xs h-7 w-7 rounded-full flex items-center justify-center border-2 border-white shadow-lg">
+                                ${cand.no}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Smooth Rising Pedestal/Pillar block -->
+                    <div class="absolute bottom-0 w-14 sm:w-20 rounded-t-2xl transition-all duration-700 ease-out shadow-2xl bg-gradient-to-t ${colors.gradient} border-t-4 border-white/30" 
+                         style="height: calc(${translationPercent}% + 10px);" id="pedestal-pillar-cand-${cand.no}">
+                        <!-- Top platform 3D representation cap -->
+                        <div class="w-full h-3 bg-white/20 rounded-t-full"></div>
+                    </div>
+                    
+                    <!-- Candidate bottom text tag -->
+                    <span class="absolute bottom-1 z-30 text-[9px] sm:text-xs font-bold text-white bg-slate-900/90 px-2 py-0.5 rounded-full border border-white/10 max-w-[90%] truncate text-center">
+                        ${cand.name}
+                    </span>`;
+                tracksContainer.appendChild(col);
+            });
+        };
+
+        window.drawNextBallots = () => {
+            if (isCardTransitioning || currentQueueIndex >= countingQueue.length) return;
+            isCardTransitioning = true; document.getElementById('btn-draw-next').disabled = true;
+
+            const flipperCard = document.getElementById('arena-flippable-card');
+            flipperCard.classList.remove('is-flipped');
+            
+            const currentVoteItem = countingQueue[currentQueueIndex];
+            const matchingCandidate = globalCandidates.find(c => c.no === currentVoteItem.candidateNo);
+
+            document.getElementById('ballot-meta-label').textContent = `เปิดนับบัตรใบที่ ${currentQueueIndex + 1}`;
+            document.getElementById('ballot-voter-label').textContent = `สิทธิ์โหวตของเด็ก ๆ "${currentVoteItem.voterName}" (${currentVoteItem.voterClass})`;
+
+            if (matchingCandidate) {
+                document.getElementById('reveal-candidate-img').src = matchingCandidate.img;
+                document.getElementById('reveal-candidate-name').textContent = `เบอร์ ${matchingCandidate.no}: ${matchingCandidate.name}`;
+            }
+
+            playSynthSound('tick');
+            setTimeout(() => {
+                flipperCard.classList.add('is-flipped'); playSynthSound('reveal');
+                
+                setTimeout(() => {
+                    const chosenNo = currentVoteItem.candidateNo;
+                    if (countingScores[chosenNo] !== undefined) countingScores[chosenNo]++;
+                    
+                    // Trigger Cute character Jump Bounce animation
+                    const runnerAvatar = document.getElementById(`runner-avatar-cand-${chosenNo}`);
+                    if (runnerAvatar) {
+                        runnerAvatar.classList.add('character-bouncing');
+                        // Tear down class after bounce finishes
+                        setTimeout(() => { runnerAvatar.classList.remove('character-bouncing'); }, 600);
+                    }
+
+                    // Trigger Level Up Power Sparkle and glowing aura effect (Requested Feature)
+                    const glowRing = document.getElementById(`glow-ring-cand-${chosenNo}`);
+                    const powerIndicator = document.getElementById(`power-indicator-cand-${chosenNo}`);
+                    
+                    if (glowRing) {
+                        glowRing.classList.remove('opacity-0');
+                        glowRing.classList.add('opacity-100', 'power-glowing');
+                        setTimeout(() => {
+                            glowRing.classList.remove('opacity-100', 'power-glowing');
+                            glowRing.classList.add('opacity-0');
+                        }, 1200);
+                    }
+
+                    if (powerIndicator) {
+                        powerIndicator.innerHTML = `<span class="text-[9px] font-black text-yellow-300 bg-slate-900/90 px-2 py-0.5 rounded-full border border-yellow-300 shadow animate-bounce">POWER UP! ⚡</span>`;
+                        setTimeout(() => { powerIndicator.innerHTML = ''; }, 1200);
+                    }
+
+                    // Play Magic level up power chime sound
+                    playSynthSound('powerup');
+
+                    // Smooth vertical pedestal heights updating
+                    globalCandidates.forEach(cand => {
+                        const score = countingScores[cand.no] || 0;
+                        const translation = Math.min((score / countingQueue.length) * 70, 70);
+                        
+                        const scoreValText = document.getElementById(`score-val-cand-${cand.no}`);
+                        if (scoreValText) scoreValText.textContent = `${score} เสียง`;
+
+                        const avatarBlock = document.getElementById(`runner-avatar-cand-${cand.no}`);
+                        const scoreBlock = document.getElementById(`floating-score-cand-${cand.no}`);
+                        const pillarBlock = document.getElementById(`pedestal-pillar-cand-${cand.no}`);
+
+                        if (avatarBlock) avatarBlock.style.bottom = `calc(${translation}% + 10px)`;
+                        if (scoreBlock) scoreBlock.style.bottom = `calc(${translation}% + 145px)`;
+                        if (pillarBlock) pillarBlock.style.height = `calc(${translation}% + 10px)`;
+                    });
+
+                    currentQueueIndex++;
+                    const progress = Math.round((currentQueueIndex / countingQueue.length) * 100);
+                    document.getElementById('arena-opened-ballots').textContent = `${currentQueueIndex} ใบ`;
+                    document.getElementById('arena-pending-ballots').textContent = `${countingQueue.length - currentQueueIndex} ใบ`;
+                    document.getElementById('arena-progress-percent').textContent = `${progress}%`;
+                    document.getElementById('arena-progress-bar').style.width = `${progress}%`;
+
+                    isCardTransitioning = false;
+                    if (currentQueueIndex < countingQueue.length) {
+                        if (!autoPlayInterval) document.getElementById('btn-draw-next').disabled = false;
+                    } else { finishCountingCelebration(); }
+                }, 800);
+            }, 400);
+        };
+
+        window.toggleAutoPlayCounting = () => {
+            const label = document.getElementById('auto-play-label');
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval); autoPlayInterval = null; label.textContent = "เปิดนับผลอัตโนมัติ (Auto Play)";
+                if (currentQueueIndex < countingQueue.length && !isCardTransitioning) document.getElementById('btn-draw-next').disabled = false;
+            } else {
+                if (currentQueueIndex >= countingQueue.length) return;
+                document.getElementById('btn-draw-next').disabled = true; label.textContent = "⏸️ หยุดการนับอัตโนมัติ";
+                drawNextBallots();
+                autoPlayInterval = setInterval(() => {
+                    if (currentQueueIndex < countingQueue.length) drawNextBallots();
+                    else { clearInterval(autoPlayInterval); autoPlayInterval = null; label.textContent = "เปิดนับผลอัตโนมัติ (Auto Play)"; }
+                }, 2500);
+            }
+        };
+
+        const finishCountingCelebration = () => {
+            if (autoPlayInterval) { clearInterval(autoPlayInterval); autoPlayInterval = null; document.getElementById('auto-play-label').textContent = "เปิดนับผลอัตโนมัติ (Auto Play)"; }
+            document.getElementById('btn-draw-next').disabled = true; document.getElementById('btn-auto-play').disabled = true;
+
+            let maxScore = -1; let winners = [];
+            globalCandidates.forEach(cand => {
+                const score = countingScores[cand.no] || 0;
+                if (score > maxScore) { maxScore = score; winners = [cand]; }
+                else if (score === maxScore) winners.push(cand);
+            });
+
+            playSynthSound('winner');
+
+            // Setup winning display details inside Cozy Winner overlay
+            const winnerModal = document.getElementById('modal-winner');
+            const winnerImg = document.getElementById('winner-profile-img');
+            const winnerBadge = document.getElementById('winner-number-badge');
+            const winnerNameText = document.getElementById('winner-name-text');
+            const winnerScoreText = document.getElementById('winner-score-text');
+            const winnerPolicyText = document.getElementById('winner-policy-text');
+
+            if (winners.length === 1) {
+                const winner = winners[0];
+                winnerImg.src = winner.img;
+                winnerBadge.textContent = winner.no;
+                winnerBadge.classList.remove('hidden');
+                winnerNameText.textContent = winner.name;
+                winnerScoreText.textContent = `คะแนนรวมสูงสุดชนะเลิศ: ${maxScore} คะแนน`;
+                winnerPolicyText.textContent = `"${winner.policy}"`;
+            } else {
+                // Tie scenario
+                winnerImg.src = 'https://img2.pic.in.th/---3---15534f60e59b0a42.png'; // School logo
+                winnerBadge.classList.add('hidden');
+                winnerNameText.textContent = "ผลการแข่งขันเสมอร่วมกัน!";
+                winnerScoreText.textContent = `คะแนนเสมอกันที่: ${maxScore} คะแนน`;
+                winnerPolicyText.textContent = `ผู้สมัครเบอร์ ${winners.map(w => w.no).join(" และ ")} ครองแชมป์คะแนนเท่ากันอย่างสมเกียรติ`;
+            }
+
+            // Display modal and trigger beautiful confetti shower
+            winnerModal.classList.remove('hidden');
+            triggerConfettiShower();
+        };
+
+        // Fire confetti & fireworks explosion showers
+        window.triggerConfettiShower = () => {
+            // Burst center
+            confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.6 }
+            });
+            // Left firework
+            setTimeout(() => {
+                confetti({
+                    particleCount: 100,
+                    angle: 60,
+                    spread: 60,
+                    origin: { x: 0, y: 0.8 }
+                });
+            }, 250);
+            // Right firework
+            setTimeout(() => {
+                confetti({
+                    particleCount: 100,
+                    angle: 120,
+                    spread: 60,
+                    origin: { x: 1, y: 0.8 }
+                });
+            }, 500);
+
+            // Continuously rain confetti sparkles for a short duration
+            let end = Date.now() + (3 * 1000);
+            (function frame() {
+                confetti({
+                    particleCount: 2,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0, y: 0.8 }
+                });
+                confetti({
+                    particleCount: 2,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1, y: 0.8 }
+                });
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        };
+
+        window.closeWinnerModal = () => {
+            document.getElementById('modal-winner').classList.add('hidden');
+        };
+
+        window.showPage = (pageName) => {
+            document.getElementById('page-home').classList.add('hidden');
+            document.getElementById('page-login').classList.add('hidden');
+            document.getElementById('page-vote').classList.add('hidden');
+            document.getElementById('page-admin').classList.add('hidden');
+            document.getElementById('page-counting-arena').classList.add('hidden');
+            document.getElementById(`page-${pageName}`).classList.remove('hidden');
+
+            if (pageName === 'home') updateStatisticalPanels();
+            else if (pageName === 'login') {
+                document.getElementById('voter-class-filter').value = "";
+                document.getElementById('voter-search').value = "";
+                renderVoterSelector();
+            } else if (pageName === 'counting-arena') {
+                document.getElementById('arena-total-ballots').textContent = `${globalVotes.length} ใบ`;
+                document.getElementById('arena-opened-ballots').textContent = `0 ใบ`;
+                document.getElementById('arena-pending-ballots').textContent = `${globalVotes.length} ใบ`;
+                document.getElementById('arena-progress-percent').textContent = `0%`;
+                document.getElementById('arena-progress-bar').style.width = `0%`;
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // ADMIN CONTROLS
+        window.isAdminLoggedIn = false;
+        window.checkAdminAccess = () => {
+            if (window.isAdminLoggedIn) showPage('admin');
+            else { document.getElementById('admin-pass-input').value = ""; document.getElementById('modal-admin-login').classList.remove('hidden'); }
+        };
+        window.closeAdminLoginModal = () => document.getElementById('modal-admin-login').classList.add('hidden');
+        window.submitAdminPassword = () => {
+            if (document.getElementById('admin-pass-input').value === '34040078') {
+                window.isAdminLoggedIn = true; closeAdminLoginModal(); showPage('admin'); switchAdminTab('students');
+            } else {
+                showCustomAlert("รหัสผ่านไม่ถูกต้อง", "คุณใส่รหัสผ่านผิดพลาด โปรดลองใหม่อีกครั้ง", "fa-circle-xmark", "text-rose-500 bg-rose-50");
+            }
+        };
+        window.logoutAdmin = () => { window.isAdminLoggedIn = false; showPage('home'); };
+
+        window.switchAdminTab = (tabName) => {
+            document.getElementById('tab-content-students').classList.add('hidden');
+            document.getElementById('tab-content-candidates').classList.add('hidden');
+            document.getElementById('tab-content-logs').classList.add('hidden');
+            document.getElementById('tab-btn-students').className = "px-6 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700 font-bold text-sm focus:outline-none transition";
+            document.getElementById('tab-btn-candidates').className = "px-6 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700 font-bold text-sm focus:outline-none transition";
+            document.getElementById('tab-btn-logs').className = "px-6 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700 font-bold text-sm focus:outline-none transition";
+
+            document.getElementById(`tab-content-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tabName}`).className = "px-6 py-3 border-b-2 border-indigo-600 text-indigo-600 font-bold text-sm focus:outline-none transition";
+        };
+
+        // ADMIN CRUD RENDERS & OPERATIONS
+        window.renderAdminStudents = () => {
+            const tbody = document.getElementById('admin-student-table-body'); tbody.innerHTML = '';
+            const query = document.getElementById('admin-search-student').value.toLowerCase().trim();
+            const filtered = globalVoters.filter(v => v.name.toLowerCase().includes(query) || v.grade.toLowerCase().includes(query));
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400"><i class="fa-solid fa-users text-4xl mb-2 block"></i>ไม่พบข้อมูลรายชื่อนักเรียน</td></tr>`; return;
+            }
+            filtered.forEach(voter => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-700">${voter.grade}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${voter.roomNo}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">${voter.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${voter.voted ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">${voter.voted ? '❌ ใช้สิทธิ์แล้ว' : '🗳️ ยังไม่ได้ใช้สิทธิ์'}</span></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-1">
+                        <button onclick="editStudent('${voter.id}')" class="text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md text-xs"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteStudent('${voter.id}')" class="text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </td>`;
+                tbody.appendChild(tr);
+            });
+        };
+
+        window.openStudentModal = (id = null) => {
+            document.getElementById('student-modal-id').value = id || "";
+            document.getElementById('student-modal-name').value = "";
+            document.getElementById('student-modal-grade').value = "";
+            document.getElementById('student-modal-no').value = "";
+            document.getElementById('student-modal-title').textContent = id ? "แก้ไขข้อมูลนักเรียน" : "เพิ่มรายชื่อนักเรียน";
+            if (id) {
+                const v = globalVoters.find(x => x.id === id);
+                if (v) {
+                    document.getElementById('student-modal-name').value = v.name;
+                    document.getElementById('student-modal-grade').value = v.grade;
+                    document.getElementById('student-modal-no').value = v.roomNo;
+                }
+            }
+            document.getElementById('modal-student-form').classList.remove('hidden');
+        };
+        window.closeStudentModal = () => document.getElementById('modal-student-form').classList.add('hidden');
+        window.saveStudentForm = async () => {
+            const id = document.getElementById('student-modal-id').value;
+            const name = document.getElementById('student-modal-name').value.trim();
+            const grade = document.getElementById('student-modal-grade').value.trim();
+            const roomNo = parseInt(document.getElementById('student-modal-no').value);
+            if (!name || !grade || isNaN(roomNo)) return;
+            
+            const ref = id ? doc(db, 'artifacts', appId, 'public', 'data', 'voters', id) : doc(collection(db, 'artifacts', appId, 'public', 'data', 'voters'));
+            await setDoc(ref, { name, grade, roomNo, voted: id ? (globalVoters.find(x=>x.id===id)?.voted || false) : false }, { merge: true });
+            closeStudentModal();
+        };
+
+        window.editStudent = (id) => openStudentModal(id);
+        window.deleteStudent = (id) => {
+            const v = globalVoters.find(x => x.id === id); if (!v) return;
+            showCustomConfirm("ยืนยันการลบนักเรียน", `คุณต้องการลบรายชื่อ "${v.name}" ใช่หรือไม่?`, async () => {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'voters', id));
+            }, "ยืนยันการลบ", "rose");
+        };
+
+        window.triggerDeleteAllStudents = () => {
+            showCustomConfirm("⚠️ ยืนยันการลบรายชื่อทั้งหมด?", "คำเตือน: ข้อมูลนักเรียนทั้งหมดจะหายไปถาวร!", async () => {
+                const batch = writeBatch(db);
+                globalVoters.forEach(v => batch.delete(doc(db, 'artifacts', appId, 'public', 'data', 'voters', v.id)));
+                await batch.commit();
+                showCustomAlert("เสร็จสิ้น", "ลบรายชื่อเรียบร้อยแล้ว", "fa-check", "text-emerald-500 bg-emerald-50");
+            }, "ยืนยันการลบทั้งหมด", "rose");
+        };
+
+        window.renderAdminCandidates = () => {
+            const grid = document.getElementById('admin-candidate-grid'); grid.innerHTML = '';
+            globalCandidates.forEach(cand => {
+                const total = globalVotes.filter(v => v.candidateNo === cand.no).length;
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl border border-slate-200 p-5 flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-4 shadow-sm";
+                card.innerHTML = `
+                    <img src="${cand.img}" class="h-28 w-24 rounded-2xl object-cover border bg-white shadow" onerror="this.src='https://placehold.co/150x200?text=${cand.no}'">
+                    <div class="space-y-2 flex-grow text-center sm:text-left">
+                        <div><span class="inline-block bg-indigo-100 text-indigo-800 font-extrabold text-xs px-2.5 py-0.5 rounded-full mb-1">หมายเลข ${cand.no}</span><h4 class="font-extrabold text-lg text-slate-900">${cand.name}</h4></div>
+                        <p class="text-xs text-slate-500"><b>นโยบาย:</b> ${cand.policy}</p>
+                        <div class="pt-2 flex items-center justify-between border-t"><span class="text-xs text-indigo-600 font-semibold">คะแนนสะสม: ${total} เสียง</span>
+                            <div class="flex space-x-1">
+                                <button onclick="editCandidate('${cand.id}')" class="text-indigo-600 bg-indigo-50 px-2 py-1 rounded text-xs font-semibold">แก้ไข</button>
+                                <button onclick="deleteCandidate('${cand.id}')" class="text-rose-600 bg-rose-50 px-2 py-1 rounded text-xs font-semibold">ลบ</button>
+                            </div>
+                        </div>
+                    </div>`;
+                grid.appendChild(card);
+            });
+        };
+
+        window.openCandidateModal = (id = null) => {
+            document.getElementById('candidate-modal-id').value = id || "";
+            document.getElementById('candidate-modal-no').value = "";
+            document.getElementById('candidate-modal-name').value = "";
+            document.getElementById('candidate-modal-img').value = "";
+            document.getElementById('candidate-modal-policy').value = "";
+            document.getElementById('candidate-modal-title').textContent = id ? "แก้ไขข้อมูลผู้สมัคร" : "เพิ่มผู้สมัครใหม่";
+            if (id) {
+                const c = globalCandidates.find(x => x.id === id);
+                if (c) {
+                    document.getElementById('candidate-modal-no').value = c.no;
+                    document.getElementById('candidate-modal-name').value = c.name;
+                    document.getElementById('candidate-modal-img').value = c.img;
+                    document.getElementById('candidate-modal-policy').value = c.policy;
+                }
+            }
+            document.getElementById('modal-candidate-form').classList.remove('hidden');
+        };
+        window.closeCandidateModal = () => document.getElementById('modal-candidate-form').classList.add('hidden');
+        window.saveCandidateForm = async () => {
+            const id = document.getElementById('candidate-modal-id').value;
+            const no = parseInt(document.getElementById('candidate-modal-no').value);
+            const name = document.getElementById('candidate-modal-name').value.trim();
+            const img = document.getElementById('candidate-modal-img').value.trim();
+            const policy = document.getElementById('candidate-modal-policy').value.trim();
+            if (isNaN(no) || !name || !policy) return;
+
+            const ref = id ? doc(db, 'artifacts', appId, 'public', 'data', 'candidates', id) : doc(db, 'artifacts', appId, 'public', 'data', 'candidates', `candidate_${no}`);
+            await setDoc(ref, { no, name, img, policy }, { merge: true });
+            closeCandidateModal();
+        };
+
+        window.editCandidate = (id) => openCandidateModal(id);
+        window.deleteCandidate = (id) => {
+            showCustomConfirm("ยืนยันลบผู้สมัคร", "ต้องการลบข้อมูลผู้สมัครรายนี้หรือไม่?", async () => {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'candidates', id));
+            }, "ยืนยันการลบ", "rose");
+        };
+
+        window.renderDetailedLogs = () => {
+            const tbody = document.getElementById('admin-logs-table-body'); tbody.innerHTML = '';
+            [...globalVotes].sort((a,b)=>b.timestamp.localeCompare(a.timestamp)).forEach((vote, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td class="px-6 py-4 text-sm text-slate-500">${idx+1}</td><td class="px-6 py-4 text-sm font-bold">${vote.voterName}</td><td class="px-6 py-4 text-sm">ชั้น ${vote.voterClass}</td><td class="px-6 py-4 text-sm font-bold text-indigo-600">เบอร์ ${vote.candidateNo}</td><td class="px-6 py-4 text-sm text-slate-500">${vote.timestamp}</td>`;
+                tbody.appendChild(tr);
+            });
+        };
+
+        // CUSTOM POPUP INTERACTIVE DIALOG HANDLERS
+        window.showCustomConfirm = (title, message, callbackOk, confirmText = "ยืนยัน", theme = "rose") => {
+            document.getElementById('modal-confirm-title').textContent = title;
+            document.getElementById('modal-confirm-message').textContent = message;
+            const iconContainer = document.getElementById('modal-confirm-icon-container');
+            const iconEl = document.getElementById('modal-confirm-icon');
+            const okBtn = document.getElementById('btn-confirm-ok');
+
+            if (theme === 'green' || theme === 'emerald') {
+                iconContainer.className = "inline-flex p-3 bg-emerald-50 text-emerald-600 rounded-full";
+                iconEl.className = "fa-solid fa-circle-check text-3xl";
+                okBtn.className = "w-1/2 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition";
+            } else {
+                iconContainer.className = "inline-flex p-3 bg-rose-50 text-rose-600 rounded-full";
+                iconEl.className = "fa-solid fa-triangle-exclamation text-3xl";
+                okBtn.className = "w-1/2 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-sm transition";
+            }
+            okBtn.textContent = confirmText;
+
+            const newOkBtn = okBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            newOkBtn.onclick = () => { document.getElementById('modal-confirm').classList.add('hidden'); if (callbackOk) callbackOk(); };
+            document.getElementById('btn-confirm-cancel').onclick = () => document.getElementById('modal-confirm').classList.add('hidden');
+            document.getElementById('modal-confirm').classList.remove('hidden');
+        };
+
+        window.showCustomAlert = (title, message, iconClass = "fa-circle-info", textBgClasses = "text-blue-600 bg-blue-50") => {
+            document.getElementById('modal-alert-title').textContent = title;
+            document.getElementById('modal-alert-message').textContent = message;
+            document.getElementById('modal-alert-icon-container').className = `inline-flex p-3 rounded-full ${textBgClasses}`;
+            document.getElementById('modal-alert-icon').className = `fa-solid ${iconClass} text-3xl`;
+            document.getElementById('modal-alert').classList.remove('hidden');
+        };
+        window.closeAlertModal = () => document.getElementById('modal-alert').classList.add('hidden');
+
+        window.onload = async () => {
+            await initAuthentication();
+            onAuthStateChanged(auth, (user) => { currentUser = user; if (user) setupRealtimeListeners(user); });
+            showPage('home');
+        };
+    </script>
+</body>
+</html>
